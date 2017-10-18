@@ -1,0 +1,50 @@
+version: '3'
+services:
+  nexus:
+    image: <container-registry-url>/cicd/nexus:3.6.0-02
+    volumes:
+      - /nfs/docker-data/container-data/cicd/nexus/nexus/data:/nexus-data
+    depends_on:
+      - nexus-nginx
+    deploy:
+      labels:
+        - nexus_service
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.labels.cicdBuildsOnly != true]
+      update_config:
+        parallelism: 1
+      restart_policy:
+        condition: any
+    networks:
+      cicd-net:
+        aliases:
+          - nexus-docker-only.example.com
+  nexus-nginx:
+    image: <container-registry-url>/cicd/nexus-nginx:1.13.5-alpine
+    ports:
+      - 53443:443
+      - 5000:5000
+      - 5001:5001
+    volumes:
+      - /nfs/docker-data/container-data/cicd/nexus/nexus-nginx/certs:/etc/ssl/certs/nginx:ro
+    deploy:
+      labels:
+        - nexus-nginx_service
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.labels.cicdBuildsOnly != true]
+      update_config:
+        parallelism: 1
+      restart_policy:
+        condition: any
+    networks:
+      cicd-net:
+        aliases:
+          - nexus-nginx-docker-only.example.com
+networks:
+  cicd-net:
+    external:
+      name: spacely-eng-core

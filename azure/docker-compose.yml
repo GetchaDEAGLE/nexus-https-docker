@@ -1,0 +1,34 @@
+version: '3'
+services:
+  nexus:
+    build: nexus
+    image: <container-registry-url>/cicd/nexus:3.6.0-02
+    container_name: Nexus
+    restart: always
+    volumes:
+      - /nfs/docker-data/container-data/cicd/nexus/nexus/data:/nexus-data
+    depends_on:
+      - nexus-nginx
+    networks:
+      cicd-net:
+        aliases:
+          - nexus-docker-only.example.com
+  nexus-nginx:
+    build: nexus-nginx
+    image: <container-registry-url>/cicd/nexus-nginx:1.13.5-alpine
+    container_name: Nexus-NGINX
+    restart: always
+    ports:
+      - 53443:443
+      - 5000:5000
+      - 5001:5001
+    volumes:
+      - /nfs/docker-data/container-data/cicd/nexus/nexus-nginx/certs:/etc/ssl/certs/nginx:ro
+    networks:
+      cicd-net:
+        aliases:
+          - nexus-nginx-docker-only.example.com
+networks:
+  cicd-net:
+    external:
+      name: spacely-eng-disparate
