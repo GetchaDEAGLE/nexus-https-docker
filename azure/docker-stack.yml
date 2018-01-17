@@ -1,7 +1,7 @@
 version: '3'
 services:
   nexus:
-    image: <container-registry-url>/cicd/nexus:3.6.0-02
+    image: <container-registry-url>/cicd/nexus:3.7.1-02
     volumes:
       - /nfs/docker-data/container-data/cicd/nexus/nexus/data:/nexus-data
     depends_on:
@@ -22,7 +22,7 @@ services:
         aliases:
           - nexus-docker-only.example.com
   nexus-nginx:
-    image: <container-registry-url>/cicd/nexus-nginx:1.13.5-alpine
+    image: <container-registry-url>/cicd/nexus-nginx:1.13.8-alpine
     ports:
       - 53443:443
       - 5000:5000
